@@ -39,15 +39,7 @@ jobs:
           echo "$GCP_SA_KEY" | base64 -w 0 > gcp_sa_key.b64
           echo "GCP_SA_KEY_B64=$(cat gcp_sa_key.b64)" >> $GITHUB_ENV
 
-      - name: Get Tree Hash
-        run: echo "TREE_HASH=$(git rev-parse HEAD^{tree})" >> $GITHUB_ENV
-
-      - name: Check CI Cache
-        id: ci_cache
-        uses: actions/cache@v3
-        with:
-          path: ci-success.txt
-          key: ci-network-scenario-${{ env.TREE_HASH }}
+      # makes more sense to write the env file here
 
       #############
       # Run
@@ -66,8 +58,4 @@ jobs:
           NAMESPACE: "v${{ github.event.client_payload.major_version }}-scenario"
           AZTEC_DOCKER_IMAGE: "aztecprotocol/aztec:${{ github.event.client_payload.semver }}"
         run: |
-          exec ./ci.sh network-scenario
-
-      - name: Save CI Success
-        if: steps.ci_cache.outputs.cache-hit != 'true'
-        run: echo "success" > ci-success.txt
+          exec ./ci.sh deploy-staging-networks
